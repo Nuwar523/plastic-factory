@@ -11,11 +11,13 @@ export default async function ProductsPage() {
     .order("id", { ascending: false });
 
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-100">
+<div className="max-w-7xl mx-auto p-6 space-y-8"> 
+  <div className="sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-gray-200">
+    <div className="max-w-7xl mx-auto px-4 py-5">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
 
-      <div className="bg-white rounded-2xl shadow-md p-6 mb-8 flex justify-between items-center">
-
-  <div>
+        <div></div>
     <h1 className="text-4xl font-bold text-gray-800">
       🛍️ إدارة المنتجات
     </h1>
@@ -51,11 +53,12 @@ export default async function ProductsPage() {
     تسجيل الخروج
   </button>
 </form>
-  </div>
 
+    </div>
+  </div>
 </div>
 
-     <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
+     <div className="hidden lg:block bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
 
         <table className="w-full table-fixed">
 
@@ -140,7 +143,68 @@ export default async function ProductsPage() {
         </table>
 
       </div>
+      <div className="lg:hidden space-y-5">
 
+  {products?.map((product) => (
+
+    <div
+      key={product.id}
+      className="bg-white rounded-3xl shadow-lg border border-gray-200 overflow-hidden"
+    >
+
+      <img
+        src={product.image || "https://placehold.co/600x400"}
+        alt={product.name}
+        className="w-full h-56 object-cover"
+      />
+
+      <div className="p-5">
+
+        <h2 className="text-2xl font-bold text-gray-800">
+          {product.name}
+        </h2>
+
+        <p className="mt-2 text-3xl font-bold text-green-600">
+          LYD {product.price}
+        </p>
+
+        <p className="mt-4 text-gray-600 leading-7">
+          {product.description}
+        </p>
+
+        <div className="grid grid-cols-2 gap-3 mt-6">
+
+          <Link
+            href={`/admin/products/${product.id}/edit`}
+            className="bg-blue-600 hover:bg-blue-700 text-white text-center py-3 rounded-xl font-semibold transition"
+          >
+            ✏️ تعديل
+          </Link>
+
+          <form
+            action={async () => {
+              "use server";
+              await deleteProduct(product.id);
+            }}
+          >
+            <button
+              type="submit"
+              className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-semibold transition"
+            >
+              🗑 حذف
+            </button>
+          </form>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  ))}
+
+</div>
+</div>
     </main>
   );
 }
