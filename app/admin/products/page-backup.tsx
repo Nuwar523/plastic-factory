@@ -159,7 +159,7 @@ export default async function ProductsPage() {
       <img
         src={product.image || "https://placehold.co/600x400"}
         alt={product.name}
-        className="w-full h-56 object-cover"
+        className="w-full h-40 object-cover rounded-t-3xl"
       />
 
       <div className="p-5">
