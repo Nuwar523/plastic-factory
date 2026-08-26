@@ -112,6 +112,13 @@ export default function AdminLayout({
                   <span className="text-lg">📊</span>
                   <span>التقارير</span>
                 </Link>
+                <Link
+  href="/admin/users"
+  className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-teal-50 hover:text-teal-700"
+>
+  <span className="text-lg">👥</span>
+  <span>المستخدمون</span>
+</Link>
 
               </nav>
 

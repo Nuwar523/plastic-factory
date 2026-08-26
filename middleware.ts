@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const ADMIN_EMAIL = "mohammed2020@gmail.com";
+
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
     request,
@@ -14,14 +16,17 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
+
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
             request.cookies.set(name, value);
+          });
 
-            response = NextResponse.next({
-              request,
-            });
+          response = NextResponse.next({
+            request,
+          });
 
+          cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options);
           });
         },
@@ -33,8 +38,23 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user && request.nextUrl.pathname.startsWith("/admin")) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  const pathname = request.nextUrl.pathname;
+
+  // Protect all /admin pages
+  if (pathname.startsWith("/admin")) {
+    // Not logged in
+    if (!user) {
+      return NextResponse.redirect(
+        new URL("/login", request.url)
+      );
+    }
+
+    // Logged in but not the admin
+    if (user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+      return NextResponse.redirect(
+        new URL("/", request.url)
+      );
+    }
   }
 
   return response;
