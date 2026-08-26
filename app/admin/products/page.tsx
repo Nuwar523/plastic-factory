@@ -1,214 +1,394 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { deleteProduct } from "./actions";
-import { logout } from "../logout";
+
 export default async function ProductsPage() {
   const supabase = await createClient();
 
-  const { data: products } = await supabase
+  const { data: products, error } = await supabase
     .from("products")
     .select("*")
     .order("id", { ascending: false });
 
+  if (error) {
+    return (
+      <div dir="rtl" className="p-8">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
+          حدث خطأ أثناء تحميل المنتجات
+        </div>
+      </div>
+    );
+  }
+
+  const totalProducts = products?.length ?? 0;
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-100">
-<div className="max-w-7xl mx-auto p-6 space-y-8"> 
-  <div className="sticky top-0 z-20 bg-white/90 backdrop-blur border-b border-gray-200">
-  <div className="max-w-7xl mx-auto px-4 py-4">
+    <div dir="rtl" className="min-h-screen bg-slate-50">
 
-    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      {/* Page Header */}
+      <div className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-7">
 
-      <div>
-        <h1 className="text-3xl lg:text-4xl font-bold text-gray-800">
-          🛍️ إدارة المنتجات
-        </h1>
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
 
-        <p className="text-gray-500 mt-1">
-          يمكنك إدارة جميع منتجات المصنع من هنا.
-        </p>
+            <div>
+              <p className="mb-1 text-sm font-semibold text-teal-600">
+                إدارة المتجر
+              </p>
+
+              <h1 className="text-3xl font-bold text-slate-900">
+                المنتجات
+              </h1>
+
+              <p className="mt-2 text-sm text-slate-500">
+                إدارة منتجات شركة البطنان والأسعار والمعلومات الخاصة بها.
+              </p>
+            </div>
+
+            <Link
+              href="/admin/products/new"
+              className="inline-flex items-center justify-center rounded-xl bg-teal-600 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-teal-700"
+            >
+              + إضافة منتج جديد
+            </Link>
+
+          </div>
+
+        </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
 
-        <div className="bg-gray-100 rounded-xl px-4 py-2 text-center min-w-[90px]">
-          <p className="text-xs text-gray-500">
-            عدد المنتجات
-          </p>
+      {/* Statistics */}
+      <div className="mx-auto max-w-7xl px-6 py-6">
 
-          <p className="text-xl font-bold text-green-600">
-            {products?.length ?? 0}
-          </p>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+
+            <div className="flex items-center justify-between">
+
+              <div>
+                <p className="text-sm text-slate-500">
+                  إجمالي المنتجات
+                </p>
+
+                <p className="mt-2 text-3xl font-bold text-slate-900">
+                  {totalProducts}
+                </p>
+              </div>
+
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-50 text-2xl">
+                📦
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+
+            <div className="flex items-center justify-between">
+
+              <div>
+                <p className="text-sm text-slate-500">
+                  المنتجات المعروضة
+                </p>
+
+                <p className="mt-2 text-3xl font-bold text-green-600">
+                  {totalProducts}
+                </p>
+              </div>
+
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-50 text-2xl">
+                ✓
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+
+            <div className="flex items-center justify-between">
+
+              <div>
+                <p className="text-sm text-slate-500">
+                  حالة المتجر
+                </p>
+
+                <p className="mt-2 text-lg font-bold text-green-600">
+                  المتجر يعمل
+                </p>
+              </div>
+
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-50">
+                <span className="h-3 w-3 rounded-full bg-green-500" />
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
 
-        <Link
-          href="/admin/products/new"
-          className="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl font-semibold transition shadow"
-        >
-          + إضافة
-        </Link>
 
-        <form action={logout}>
-          <button
-            type="submit"
-            className="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl font-semibold transition shadow"
-          >
-            خروج
-          </button>
-        </form>
+        {/* Products Table */}
+        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
-      </div>
+          <div className="border-b border-slate-200 px-6 py-5">
 
-    </div>
+            <div className="flex items-center justify-between">
 
-  </div>
-</div>
-     <div className="hidden lg:block bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">
+                  قائمة المنتجات
+                </h2>
 
-        <table className="w-full table-fixed">
+                <p className="mt-1 text-sm text-slate-500">
+                  جميع المنتجات الموجودة في المتجر.
+                </p>
+              </div>
 
-          <thead className="bg-gray-50 text-gray-700">
+              <span className="rounded-full bg-teal-50 px-3 py-1 text-sm font-semibold text-teal-700">
+                {totalProducts} منتجات
+              </span>
 
-            <tr>
-              <th className="p-5 text-center font-bold w-24">الصورة</th>
+            </div>
 
-<th className="p-5 text-center font-bold w-52">الاسم</th>
+          </div>
 
-<th className="p-5 text-center font-bold w-32">السعر</th>
 
-<th className="p-5 text-center font-bold">الوصف</th>
+          {/* Desktop Table */}
+          <div className="hidden overflow-x-auto lg:block">
 
-<th className="p-5 text-center font-bold w-44">العمليات</th>
+            <table className="w-full text-right">
 
-            </tr>
+              <thead className="bg-slate-50">
 
-          </thead>
+                <tr className="border-b border-slate-200">
 
-          <tbody>
+                  <th className="px-6 py-4 text-sm font-semibold text-slate-600">
+                    المنتج
+                  </th>
+
+                  <th className="px-6 py-4 text-sm font-semibold text-slate-600">
+                    السعر
+                  </th>
+
+                  <th className="px-6 py-4 text-sm font-semibold text-slate-600">
+                    الوصف
+                  </th>
+
+                  <th className="px-6 py-4 text-sm font-semibold text-slate-600">
+                    الحالة
+                  </th>
+
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-slate-600">
+                    العمليات
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+                {products?.map((product) => (
+
+                  <tr
+                    key={product.id}
+                    className="border-b border-slate-100 transition hover:bg-slate-50"
+                  >
+
+                    {/* Product */}
+                    <td className="px-6 py-5">
+
+                      <div className="flex items-center gap-4">
+
+                        <img
+                          src={
+                            product.image ||
+                            "https://placehold.co/80x80"
+                          }
+                          alt={product.name}
+                          className="h-14 w-14 rounded-xl border border-slate-200 object-cover"
+                        />
+
+                        <div>
+
+                          <p className="font-semibold text-slate-900">
+                            {product.name}
+                          </p>
+
+                          <p className="mt-1 text-xs text-slate-400">
+                            رقم المنتج #{product.id}
+                          </p>
+
+                        </div>
+
+                      </div>
+
+                    </td>
+
+
+                    {/* Price */}
+                    <td className="px-6 py-5">
+
+                      <span className="font-bold text-teal-600">
+                        LYD {product.price}
+                      </span>
+
+                    </td>
+
+
+                    {/* Description */}
+                    <td className="max-w-xs px-6 py-5">
+
+                      <p className="line-clamp-2 text-sm leading-6 text-slate-500">
+                        {product.description || "لا يوجد وصف"}
+                      </p>
+
+                    </td>
+
+
+                    {/* Status */}
+                    <td className="px-6 py-5">
+
+                      <span className="inline-flex items-center gap-2 rounded-full bg-green-50 px-3 py-1.5 text-sm font-medium text-green-700">
+
+                        <span className="h-2 w-2 rounded-full bg-green-500" />
+
+                        متوفر
+
+                      </span>
+
+                    </td>
+
+
+                    {/* Actions */}
+                    <td className="px-6 py-5">
+
+                      <div className="flex items-center justify-center gap-2">
+
+                        <Link
+                          href={`/admin/products/${product.id}/edit`}
+                          className="rounded-lg bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-100"
+                        >
+                          تعديل
+                        </Link>
+
+
+                        <form
+                          action={async () => {
+                            "use server";
+                            await deleteProduct(product.id);
+                          }}
+                        >
+
+                          <button
+                            type="submit"
+                            className="rounded-lg bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+                          >
+                            حذف
+                          </button>
+
+                        </form>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+
+                ))}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+
+          {/* Mobile Cards */}
+          <div className="space-y-4 p-4 lg:hidden">
 
             {products?.map((product) => (
 
-              <tr
-  key={product.id}
-  className="border-t hover:bg-gray-50 transition duration-200"
->
-                <td className="p-4 text-center">
-  <img
-    src={product.image || "https://placehold.co/80x80"}
-    alt={product.name}
-    className="w-20 h-20 rounded-xl object-cover mx-auto border border-gray-200 shadow-sm"
-  />
-</td>
+              <div
+                key={product.id}
+                className="overflow-hidden rounded-2xl border border-slate-200 bg-white"
+              >
 
-<td className="p-4 text-center font-medium">
-  {product.name}
-</td>
+                <div className="flex gap-4 p-4">
 
-<td className="p-4 text-center font-semibold text-green-600">
-  LYD {product.price}
-</td>
+                  <img
+                    src={
+                      product.image ||
+                      "https://placehold.co/100x100"
+                    }
+                    alt={product.name}
+                    className="h-20 w-20 rounded-xl object-cover"
+                  />
 
-<td className="p-4 text-center">
-  <p className="line-clamp-2 break-words">
-    {product.description}
-  </p>
-</td>
+                  <div className="min-w-0 flex-1">
 
-<td className="p-4">
+                    <h3 className="font-bold text-slate-900">
+                      {product.name}
+                    </h3>
 
-  <Link
-    href={`/admin/products/${product.id}/edit`}
-    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition font-medium"
-  >
-    تعديل
-  </Link>
+                    <p className="mt-1 text-lg font-bold text-teal-600">
+                      LYD {product.price}
+                    </p>
 
-  <form
-  action={async () => {
-    "use server";
-    await deleteProduct(product.id);
-  }}
->
-  <button
-    type="submit"
-    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition font-medium"
-  >
-    حذف
-  </button>
-</form>
+                    <p className="mt-2 text-sm text-slate-500">
+                      {product.description || "لا يوجد وصف"}
+                    </p>
 
-</td>
+                  </div>
 
-              </tr>
+                </div>
+
+
+                <div className="grid grid-cols-2 gap-3 border-t border-slate-100 p-4">
+
+                  <Link
+                    href={`/admin/products/${product.id}/edit`}
+                    className="rounded-xl bg-blue-50 py-3 text-center font-semibold text-blue-600"
+                  >
+                    تعديل
+                  </Link>
+
+                  <form
+                    action={async () => {
+                      "use server";
+                      await deleteProduct(product.id);
+                    }}
+                  >
+
+                    <button
+                      type="submit"
+                      className="w-full rounded-xl bg-red-50 py-3 font-semibold text-red-600"
+                    >
+                      حذف
+                    </button>
+
+                  </form>
+
+                </div>
+
+              </div>
 
             ))}
 
-          </tbody>
-
-        </table>
-
-      </div>
-      <div className="lg:hidden space-y-5">
-
-  {products?.map((product) => (
-
-    <div
-      key={product.id}
-      className="bg-white rounded-3xl shadow-lg border border-gray-200 overflow-hidden"
-    >
-
-      <img
-        src={product.image || "https://placehold.co/600x400"}
-        alt={product.name}
-        className="w-full h-56 object-cover"
-      />
-
-      <div className="p-5">
-
-        <h2 className="text-2xl font-bold text-gray-800">
-          {product.name}
-        </h2>
-
-        <p className="mt-2 text-3xl font-bold text-green-600">
-          LYD {product.price}
-        </p>
-
-        <p className="mt-4 text-gray-600 leading-7">
-          {product.description}
-        </p>
-
-        <div className="grid grid-cols-2 gap-3 mt-6">
-
-          <Link
-            href={`/admin/products/${product.id}/edit`}
-            className="bg-blue-600 hover:bg-blue-700 text-white text-center py-3 rounded-xl font-semibold transition"
-          >
-            ✏️ تعديل
-          </Link>
-
-          <form
-            action={async () => {
-              "use server";
-              await deleteProduct(product.id);
-            }}
-          >
-            <button
-              type="submit"
-              className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-semibold transition"
-            >
-              🗑 حذف
-            </button>
-          </form>
+          </div>
 
         </div>
 
       </div>
 
     </div>
-
-  ))}
-
-</div>
-</div>
-    </main>
   );
 }
