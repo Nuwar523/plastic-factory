@@ -1,14 +1,23 @@
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 
 export default async function ReportsPage() {
   const supabase = await createClient();
 
-  // جلب عدد المنتجات
+  // Admin client - يستخدم المفتاح السري لجلب مستخدمي Supabase
+  const supabaseAdmin = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!
+  );
+
+  // =========================
+  // المنتجات
+  // =========================
+
   const { count: productsCount } = await supabase
     .from("products")
     .select("*", { count: "exact", head: true });
 
-  // جلب المنتجات لحساب الكمية الموجودة
   const { data: products } = await supabase
     .from("products")
     .select("stock");
@@ -18,10 +27,42 @@ export default async function ReportsPage() {
       return total + (Number(product.stock) || 0);
     }, 0) || 0;
 
-  // جلب عدد الطلبات
+  // =========================
+  // الطلبات
+  // =========================
+
   const { count: ordersCount } = await supabase
     .from("orders")
     .select("*", { count: "exact", head: true });
+
+  // =========================
+  // المستخدمون
+  // =========================
+
+  const { data: usersData } = await supabaseAdmin.auth.admin.listUsers({
+    page: 1,
+    perPage: 1000,
+  });
+
+  const users = usersData?.users || [];
+
+  const usersTotal = users.length;
+
+  // المستخدم النشط = سجل دخوله خلال آخر 30 يوم
+  const thirtyDaysAgo =
+    Date.now() - 30 * 24 * 60 * 60 * 1000;
+
+  const activeUsers = users.filter((user) => {
+    if (!user.last_sign_in_at) return false;
+
+    return (
+      new Date(user.last_sign_in_at).getTime() >= thirtyDaysAgo
+    );
+  }).length;
+
+  // =========================
+  // القيم النهائية
+  // =========================
 
   const productsTotal = productsCount || 0;
   const ordersTotal = ordersCount || 0;
@@ -49,7 +90,7 @@ export default async function ReportsPage() {
         </div>
 
         {/* Statistics */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
 
           {/* Products */}
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -120,7 +161,53 @@ export default async function ReportsPage() {
             </div>
           </div>
 
-          {/* Status */}
+          {/* Users */}
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-bold text-slate-500">
+                  إجمالي المستخدمين
+                </p>
+
+                <h2 className="mt-3 text-4xl font-black text-slate-800">
+                  {usersTotal}
+                </h2>
+
+                <p className="mt-2 text-xs text-purple-600">
+                  جميع الحسابات المسجلة
+                </p>
+              </div>
+
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-3xl">
+                👥
+              </div>
+            </div>
+          </div>
+
+          {/* Active Users */}
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-bold text-slate-500">
+                  المستخدمون النشطون
+                </p>
+
+                <h2 className="mt-3 text-4xl font-black text-slate-800">
+                  {activeUsers}
+                </h2>
+
+                <p className="mt-2 text-xs text-green-600">
+                  سجلوا دخول خلال آخر 30 يوم
+                </p>
+              </div>
+
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100 text-3xl">
+                🟢
+              </div>
+            </div>
+          </div>
+
+          {/* Store Status */}
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
@@ -148,13 +235,14 @@ export default async function ReportsPage() {
         {/* Overview */}
         <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
 
+          {/* Store Summary */}
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-black text-slate-800">
               ملخص المتجر
             </h2>
 
             <p className="mt-2 text-sm text-slate-500">
-              معلومات سريعة عن المنتجات والطلبات والمخزون.
+              معلومات سريعة عن المنتجات والطلبات والمخزون والمستخدمين.
             </p>
 
             <div className="mt-6 space-y-4">
@@ -186,6 +274,26 @@ export default async function ReportsPage() {
 
                 <span className="font-black text-blue-600">
                   {totalStock}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-4">
+                <span className="font-bold text-slate-600">
+                  المستخدمون
+                </span>
+
+                <span className="font-black text-purple-600">
+                  {usersTotal}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-4">
+                <span className="font-bold text-slate-600">
+                  المستخدمون النشطون
+                </span>
+
+                <span className="font-black text-green-600">
+                  {activeUsers}
                 </span>
               </div>
 
@@ -250,6 +358,21 @@ export default async function ReportsPage() {
               </a>
 
               <a
+                href="/admin/users"
+                className="rounded-2xl bg-purple-50 p-5 transition hover:-translate-y-1 hover:bg-purple-100"
+              >
+                <div className="text-3xl">👥</div>
+
+                <h3 className="mt-3 font-black text-slate-800">
+                  المستخدمون
+                </h3>
+
+                <p className="mt-1 text-xs text-slate-500">
+                  إدارة حسابات المستخدمين
+                </p>
+              </a>
+
+              <a
                 href="/"
                 className="rounded-2xl bg-slate-50 p-5 transition hover:-translate-y-1 hover:bg-slate-100"
               >
@@ -269,9 +392,9 @@ export default async function ReportsPage() {
 
         </div>
 
-        {/* Footer note */}
+        {/* Footer */}
         <div className="mt-8 rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-center text-sm text-emerald-700">
-          📊 يتم تحديث إحصائيات المنتجات والطلبات تلقائيًا من قاعدة البيانات.
+          📊 يتم تحديث إحصائيات المنتجات والطلبات والمستخدمين تلقائيًا من قاعدة البيانات.
         </div>
 
       </div>

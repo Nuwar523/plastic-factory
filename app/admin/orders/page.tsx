@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
+import { updateOrderStatus } from "./actions";
 
 function getStatusLabel(status: string | null) {
   switch (status) {
@@ -7,6 +8,8 @@ function getStatusLabel(status: string | null) {
       return "طلب جديد";
     case "pending":
       return "قيد المراجعة";
+    case "accepted":
+      return "مقبول";
     case "completed":
       return "مكتمل";
     case "cancelled":
@@ -20,12 +23,21 @@ function getStatusStyle(status: string | null) {
   switch (status) {
     case "completed":
       return "bg-green-50 text-green-700 border-green-200";
+
     case "cancelled":
       return "bg-red-50 text-red-700 border-red-200";
+
+    case "accepted":
+      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+
     case "new":
       return "bg-blue-50 text-blue-700 border-blue-200";
-    default:
+
+    case "pending":
       return "bg-orange-50 text-orange-700 border-orange-200";
+
+    default:
+      return "bg-slate-50 text-slate-700 border-slate-200";
   }
 }
 
@@ -33,12 +45,21 @@ function getStatusDot(status: string | null) {
   switch (status) {
     case "completed":
       return "bg-green-500";
+
     case "cancelled":
       return "bg-red-500";
+
+    case "accepted":
+      return "bg-emerald-500";
+
     case "new":
       return "bg-blue-500";
-    default:
+
+    case "pending":
       return "bg-orange-500";
+
+    default:
+      return "bg-slate-400";
   }
 }
 
@@ -54,7 +75,8 @@ export default async function OrdersPage() {
     return (
       <div dir="rtl" className="p-8">
         <div className="rounded-2xl bg-red-50 p-6 text-red-700">
-          حدث خطأ في تحميل الطلبات
+          <h2 className="font-bold">حدث خطأ في تحميل الطلبات</h2>
+
           <p className="mt-2 text-sm">{error.message}</p>
         </div>
       </div>
@@ -70,6 +92,10 @@ export default async function OrdersPage() {
       order.status === "new" ||
       order.status === "pending" ||
       !order.status
+  ).length;
+
+  const acceptedOrders = allOrders.filter(
+    (order) => order.status === "accepted"
   ).length;
 
   const completedOrders = allOrders.filter(
@@ -105,8 +131,9 @@ export default async function OrdersPage() {
       <div className="mx-auto max-w-7xl px-6 py-6">
 
         {/* Statistics */}
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
 
+          {/* Total */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-sm text-slate-500">
               إجمالي الطلبات
@@ -121,6 +148,7 @@ export default async function OrdersPage() {
             </p>
           </div>
 
+          {/* Pending */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-sm text-slate-500">
               تحتاج إلى مراجعة
@@ -135,6 +163,22 @@ export default async function OrdersPage() {
             </p>
           </div>
 
+          {/* Accepted */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-sm text-slate-500">
+              الطلبات المقبولة
+            </p>
+
+            <p className="mt-2 text-3xl font-bold text-emerald-600">
+              {acceptedOrders}
+            </p>
+
+            <p className="mt-1 text-xs text-emerald-500">
+              تم قبولها
+            </p>
+          </div>
+
+          {/* Completed */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-sm text-slate-500">
               الطلبات المكتملة
@@ -149,6 +193,7 @@ export default async function OrdersPage() {
             </p>
           </div>
 
+          {/* Cancelled */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-sm text-slate-500">
               الطلبات الملغاة
@@ -168,6 +213,7 @@ export default async function OrdersPage() {
         {/* Orders */}
         <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
+          {/* Title */}
           <div className="border-b border-slate-200 px-6 py-5">
             <div className="flex items-center justify-between">
 
@@ -198,7 +244,7 @@ export default async function OrdersPage() {
 
             <div className="overflow-x-auto">
 
-              <table className="w-full min-w-[950px]">
+              <table className="w-full min-w-[1100px]">
 
                 <thead className="bg-slate-50">
                   <tr className="border-b border-slate-200">
@@ -225,6 +271,10 @@ export default async function OrdersPage() {
 
                     <th className="px-6 py-4 text-center text-sm font-semibold text-slate-600">
                       الحالة
+                    </th>
+
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-slate-600">
+                      الإجراءات
                     </th>
 
                     <th className="px-6 py-4 text-right text-sm font-semibold text-slate-600">
@@ -308,6 +358,110 @@ export default async function OrdersPage() {
 
                       </td>
 
+                      {/* Actions */}
+                      <td className="px-6 py-5">
+
+                        <div className="flex flex-wrap items-center justify-center gap-2">
+
+                          {/* Accept */}
+                          {(order.status === "new" ||
+                            order.status === "pending" ||
+                            !order.status) && (
+
+                            <form action={updateOrderStatus}>
+
+                              <input
+                                type="hidden"
+                                name="orderId"
+                                value={order.id}
+                              />
+
+                              <input
+                                type="hidden"
+                                name="status"
+                                value="accepted"
+                              />
+
+                              <button
+                                type="submit"
+                                className="rounded-lg bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-100"
+                              >
+                                ✓ قبول
+                              </button>
+
+                            </form>
+
+                          )}
+
+                          {/* Complete */}
+                          {order.status === "accepted" && (
+
+                            <form action={updateOrderStatus}>
+
+                              <input
+                                type="hidden"
+                                name="orderId"
+                                value={order.id}
+                              />
+
+                              <input
+                                type="hidden"
+                                name="status"
+                                value="completed"
+                              />
+
+                              <button
+                                type="submit"
+                                className="rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 transition hover:bg-blue-100"
+                              >
+                                ✓ مكتمل
+                              </button>
+
+                            </form>
+
+                          )}
+
+                          {/* Cancel */}
+                          {order.status !== "cancelled" &&
+                            order.status !== "completed" && (
+
+                            <form action={updateOrderStatus}>
+
+                              <input
+                                type="hidden"
+                                name="orderId"
+                                value={order.id}
+                              />
+
+                              <input
+                                type="hidden"
+                                name="status"
+                                value="cancelled"
+                              />
+
+                              <button
+                                type="submit"
+                                className="rounded-lg bg-red-50 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-100"
+                              >
+                                ✕ إلغاء
+                              </button>
+
+                            </form>
+
+                          )}
+
+                          {/* Details */}
+                          <Link
+                            href={`/admin/orders/${order.id}`}
+                            className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-200"
+                          >
+                            👁 التفاصيل
+                          </Link>
+
+                        </div>
+
+                      </td>
+
                       {/* Date */}
                       <td className="px-6 py-5">
 
@@ -320,6 +474,7 @@ export default async function OrdersPage() {
                             : "-"}
 
                           <p className="mt-1 text-xs text-slate-400">
+
                             {order.created_at
                               ? new Date(
                                   order.created_at
@@ -328,6 +483,7 @@ export default async function OrdersPage() {
                                   minute: "2-digit",
                                 })
                               : ""}
+
                           </p>
 
                         </div>

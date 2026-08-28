@@ -35,6 +35,28 @@ export default async function OrderPage({ params }: Props) {
     const city = String(formData.get("city") || "").trim();
     const quantity = Number(formData.get("quantity"));
     const notes = String(formData.get("notes") || "").trim();
+    const image = formData.get("image") as File;
+
+let imageUrl: string | null = null;
+
+if (image && image.size > 0) {
+  const fileExt = image.name.split(".").pop() || "jpg";
+const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("order-images")
+    .upload(fileName, image);
+
+  if (uploadError) {
+    throw new Error(uploadError.message);
+  }
+
+  const { data } = supabase.storage
+    .from("order-images")
+    .getPublicUrl(fileName);
+
+  imageUrl = data.publicUrl;
+}
 
     if (!customerName || !phone || !city || !quantity || quantity < 1) {
       return;
@@ -43,11 +65,12 @@ export default async function OrderPage({ params }: Props) {
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .insert({
-        customer_name: customerName,
-        phone,
-        city,
-        notes: notes || null,
-      })
+  customer_name: customerName,
+  phone,
+  city,
+  notes: notes || null,
+  customer_image: imageUrl,
+})
       .select("id")
       .single();
 
@@ -169,6 +192,22 @@ export default async function OrderPage({ params }: Props) {
                 className="w-full rounded-xl border border-gray-300 p-3 outline-none focus:border-teal-500"
               />
             </div>
+            <div>
+  <label className="mb-2 block font-semibold">
+    صورة مرفقة
+  </label>
+
+  <input
+    name="image"
+    type="file"
+    accept="image/*"
+    className="w-full rounded-xl border border-gray-300 bg-white p-3"
+  />
+
+  <p className="mt-2 text-sm text-gray-500">
+    يمكنك رفع صورة توضح التصميم أو الشكل المطلوب.
+  </p>
+</div>
 
             <div>
               <label className="mb-2 block font-semibold">

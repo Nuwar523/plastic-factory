@@ -5,19 +5,17 @@ import { redirect } from "next/navigation";
 
 export async function updateProduct(formData: FormData) {
   const supabase = await createClient();
-  
 
-  const id = formData.get("id") as string;
-  const name = formData.get("name") as string;
-  const price = Number(formData.get("price"));
-  const description = formData.get("description") as string;
+  const id = String(formData.get("id") || "");
+  const name = String(formData.get("name") || "");
+  const price = Number(formData.get("price") || 0);
+  const description = String(formData.get("description") || "");
 
-  const image = formData.get("image") as File;
-  
+  const image = formData.get("image");
 
   let imageUrl: string | undefined;
 
-  if (image && image.size > 0) {
+  if (image instanceof File && image.size > 0) {
     const fileName = `${Date.now()}-${image.name}`;
 
     const { error: uploadError } = await supabase.storage
@@ -50,16 +48,14 @@ export async function updateProduct(formData: FormData) {
     updateData.image = imageUrl;
   }
 
-  const { data, error } = await supabase
-  .from("products")
-  .update(updateData)
-  .eq("id", id)
-  .select();
-
-
+  const { error } = await supabase
+    .from("products")
+    .update(updateData)
+    .eq("id", id);
 
   if (error) {
     throw new Error(error.message);
   }
+
   redirect("/admin/products");
 }

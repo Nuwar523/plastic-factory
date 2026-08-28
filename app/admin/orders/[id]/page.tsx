@@ -1,5 +1,67 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { updateOrderStatus } from "../actions";
+
+function getStatusLabel(status: string | null) {
+  switch (status) {
+    case "new":
+      return "طلب جديد";
+
+    case "pending":
+      return "قيد المراجعة";
+
+    case "accepted":
+      return "مقبول";
+
+    case "completed":
+      return "مكتمل";
+
+    case "cancelled":
+      return "ملغي";
+
+    default:
+      return status || "جديد";
+  }
+}
+
+function getStatusStyle(status: string | null) {
+  switch (status) {
+    case "accepted":
+      return {
+        box: "border-emerald-100 bg-emerald-50",
+        text: "text-emerald-700",
+        badge: "bg-emerald-100 text-emerald-700",
+      };
+
+    case "completed":
+      return {
+        box: "border-green-100 bg-green-50",
+        text: "text-green-700",
+        badge: "bg-green-100 text-green-700",
+      };
+
+    case "cancelled":
+      return {
+        box: "border-red-100 bg-red-50",
+        text: "text-red-700",
+        badge: "bg-red-100 text-red-700",
+      };
+
+    case "new":
+      return {
+        box: "border-blue-100 bg-blue-50",
+        text: "text-blue-700",
+        badge: "bg-blue-100 text-blue-700",
+      };
+
+    default:
+      return {
+        box: "border-orange-100 bg-orange-50",
+        text: "text-orange-700",
+        badge: "bg-orange-100 text-orange-700",
+      };
+  }
+}
 
 export default async function OrderDetailsPage({
   params,
@@ -24,7 +86,10 @@ export default async function OrderDetailsPage({
         className="min-h-screen bg-slate-50 p-8"
       >
         <div className="mx-auto max-w-3xl rounded-3xl bg-white p-10 text-center shadow-sm">
-          <div className="text-5xl">😕</div>
+
+          <div className="text-5xl">
+            😕
+          </div>
 
           <h1 className="mt-4 text-2xl font-bold text-slate-900">
             الطلب غير موجود
@@ -40,6 +105,7 @@ export default async function OrderDetailsPage({
           >
             العودة إلى الطلبات
           </Link>
+
         </div>
       </main>
     );
@@ -61,14 +127,11 @@ export default async function OrderDetailsPage({
         .single()
     : { data: null };
 
-  const quantity = item?.quantity ?? order.quantity ?? 0;
+  const quantity = item?.quantity ?? 0;
 
-  const status =
-    order.status === "completed"
-      ? "مكتمل"
-      : order.status === "cancelled"
-      ? "ملغي"
-      : "قيد المراجعة";
+  const statusLabel = getStatusLabel(order.status);
+
+  const statusStyle = getStatusStyle(order.status);
 
   return (
     <main
@@ -103,37 +166,122 @@ export default async function OrderDetailsPage({
 
         </div>
 
-
         {/* Status */}
-        <div className="mb-6 rounded-2xl border border-orange-100 bg-orange-50 p-5">
-
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div
+          className={`mb-6 rounded-2xl border p-5 ${statusStyle.box}`}
+        >
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
 
             <div>
               <p className="text-sm text-slate-500">
                 حالة الطلب
               </p>
 
-              <p className="mt-1 text-xl font-bold text-orange-600">
-                {status}
+              <p
+                className={`mt-1 text-xl font-bold ${statusStyle.text}`}
+              >
+                {statusLabel}
               </p>
             </div>
 
-            <span className="w-fit rounded-full bg-orange-100 px-4 py-2 text-sm font-bold text-orange-700">
-              ● {status}
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+
+              <span
+                className={`rounded-full px-4 py-2 text-sm font-bold ${statusStyle.badge}`}
+              >
+                ● {statusLabel}
+              </span>
+
+              {/* Accept */}
+{(order.status === "new" || order.status === "pending" || !order.status) && (
+  <form action={updateOrderStatus}>
+    <input
+      type="hidden"
+      name="orderId"
+      value={order.id}
+    />
+
+    <input
+      type="hidden"
+      name="status"
+      value="accepted"
+    />
+
+    <button
+      type="submit"
+      className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700"
+    >
+      ✓ قبول الطلب
+    </button>
+  </form>
+)}
+
+              {/* Complete */}
+              {order.status === "accepted" && (
+                <form action={updateOrderStatus}>
+
+                  <input
+                    type="hidden"
+                    name="orderId"
+                    value={order.id}
+                  />
+
+                  <input
+                    type="hidden"
+                    name="status"
+                    value="completed"
+                  />
+
+                  <button
+                    type="submit"
+                    className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700"
+                  >
+                    ✓ تحديد كمكتمل
+                  </button>
+
+                </form>
+              )}
+
+              {/* Cancel */}
+              {order.status !== "cancelled" &&
+                order.status !== "completed" && (
+                  <form action={updateOrderStatus}>
+
+                    <input
+                      type="hidden"
+                      name="orderId"
+                      value={order.id}
+                    />
+
+                    <input
+                      type="hidden"
+                      name="status"
+                      value="cancelled"
+                    />
+
+                    <button
+                      type="submit"
+                      className="rounded-xl bg-red-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-red-700"
+                    >
+                      ✕ إلغاء الطلب
+                    </button>
+
+                  </form>
+                )}
+
+            </div>
 
           </div>
-
         </div>
 
-
+        {/* Main information */}
         <div className="grid gap-6 lg:grid-cols-3">
 
           {/* Customer */}
           <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
 
             <div className="mb-5 flex items-center gap-3">
+
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-xl">
                 👤
               </div>
@@ -147,6 +295,7 @@ export default async function OrderDetailsPage({
                   معلومات التواصل
                 </p>
               </div>
+
             </div>
 
             <div className="space-y-5">
@@ -179,17 +328,30 @@ export default async function OrderDetailsPage({
                 <p className="mt-1 font-semibold text-slate-800">
                   {order.city || "-"}
                 </p>
+                {order.customer_image && (
+  <div>
+    <p className="text-sm text-slate-400">
+      الصورة المرفقة
+    </p>
+
+    <img
+      src={order.customer_image}
+      alt="الصورة المرفقة من العميل"
+      className="mt-2 h-48 w-full rounded-2xl object-cover border border-slate-200"
+    />
+  </div>
+)}
               </div>
 
             </div>
 
           </section>
 
-
           {/* Product */}
           <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
 
             <div className="mb-5 flex items-center gap-3">
+
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-xl">
                 📦
               </div>
@@ -203,6 +365,7 @@ export default async function OrderDetailsPage({
                   المنتج المطلوب
                 </p>
               </div>
+
             </div>
 
             {product ? (
@@ -254,11 +417,11 @@ export default async function OrderDetailsPage({
 
           </section>
 
-
           {/* Notes */}
           <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
 
             <div className="mb-5 flex items-center gap-3">
+
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-xl">
                 📝
               </div>
@@ -272,6 +435,7 @@ export default async function OrderDetailsPage({
                   التفاصيل الإضافية
                 </p>
               </div>
+
             </div>
 
             <div className="min-h-32 rounded-2xl bg-slate-50 p-5 leading-7 text-slate-600">
@@ -281,7 +445,6 @@ export default async function OrderDetailsPage({
           </section>
 
         </div>
-
 
         {/* Order information */}
         <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -319,9 +482,9 @@ export default async function OrderDetailsPage({
 
               <p className="mt-1 font-bold">
                 {order.created_at
-                  ? new Date(order.created_at).toLocaleDateString(
-                      "ar-LY"
-                    )
+                  ? new Date(
+                      order.created_at
+                    ).toLocaleDateString("ar-LY")
                   : "-"}
               </p>
             </div>
@@ -333,13 +496,12 @@ export default async function OrderDetailsPage({
 
               <p className="mt-1 font-bold">
                 {order.created_at
-                  ? new Date(order.created_at).toLocaleTimeString(
-                      "ar-LY",
-                      {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      }
-                    )
+                  ? new Date(
+                      order.created_at
+                    ).toLocaleTimeString("ar-LY", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
                   : "-"}
               </p>
             </div>
