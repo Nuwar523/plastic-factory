@@ -127,7 +127,8 @@ export default async function OrderDetailsPage({
         .single()
     : { data: null };
 
-  const quantity = item?.quantity ?? 0;
+  const quantity = item?.quantity ?? order.quantity ?? 0;
+  const customerImage = (order as any).customer_image as string | null;
 
   const statusLabel = getStatusLabel(order.status);
 
@@ -328,19 +329,32 @@ export default async function OrderDetailsPage({
                 <p className="mt-1 font-semibold text-slate-800">
                   {order.city || "-"}
                 </p>
-                {order.customer_image && (
+                
+  {customerImage && (
   <div>
     <p className="text-sm text-slate-400">
       الصورة المرفقة
     </p>
 
-    <img
-      src={order.customer_image}
-      alt="الصورة المرفقة من العميل"
-      className="mt-2 h-48 w-full rounded-2xl object-cover border border-slate-200"
-    />
+    <a
+      href={customerImage}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block"
+    >
+      <img
+        src={customerImage}
+        alt="الصورة المرفقة من العميل"
+        className="mt-2 h-64 w-full rounded-2xl border object-contain bg-slate-50 cursor-pointer transition hover:scale-[1.01]"
+      />
+    </a>
+
+    <p className="mt-2 text-sm text-teal-600">
+      اضغط على الصورة لفتحها بحجم أكبر
+    </p>
   </div>
 )}
+
               </div>
 
             </div>

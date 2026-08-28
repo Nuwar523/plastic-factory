@@ -13,6 +13,9 @@ export default async function OrderPage({ params }: Props) {
   const { id } = await params;
 
   const supabase = await createClient();
+  const {
+  data: { user },
+} = await supabase.auth.getUser();
 
   const { data: product } = await supabase
     .from("products")
@@ -29,6 +32,9 @@ export default async function OrderPage({ params }: Props) {
     "use server";
 
     const supabase = await createClient();
+    const {
+  data: { user },
+} = await supabase.auth.getUser();
 
     const customerName = String(formData.get("customer_name") || "").trim();
     const phone = String(formData.get("phone") || "").trim();
@@ -65,6 +71,7 @@ const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .insert({
+        user_id: user?.id ?? null,
   customer_name: customerName,
   phone,
   city,
@@ -92,7 +99,7 @@ const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
       throw new Error("فشل في إضافة المنتج إلى الطلب");
     }
 
-    redirect(`/products/${product.id}/order/success`);
+   redirect(`/products/${product.id}/order/success?orderId=${order.id}`);
   }
 
   return (
