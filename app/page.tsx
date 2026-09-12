@@ -53,17 +53,17 @@ const services = [
 ];
 
 function Icon({ name }: { name: string }) {
-  const common = {
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.8,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-  };
-
   if (name === "factory" || name === "industry") {
     return (
-      <svg viewBox="0 0 24 24" className="h-6 w-6" {...common}>
+      <svg
+        viewBox="0 0 24 24"
+        className="h-6 w-6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M3 21V9l6 3V9l6 3V5h3v16" />
         <path d="M3 21h18" />
         <path d="M7 16h2M12 16h2M17 16h1M7 19h2M12 19h2M17 19h1" />
@@ -73,7 +73,15 @@ function Icon({ name }: { name: string }) {
 
   if (name === "print") {
     return (
-      <svg viewBox="0 0 24 24" className="h-6 w-6" {...common}>
+      <svg
+        viewBox="0 0 24 24"
+        className="h-6 w-6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M6 9V3h12v6" />
         <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
         <path d="M6 14h12v7H6z" />
@@ -84,7 +92,15 @@ function Icon({ name }: { name: string }) {
 
   if (name === "check") {
     return (
-      <svg viewBox="0 0 24 24" className="h-6 w-6" {...common}>
+      <svg
+        viewBox="0 0 24 24"
+        className="h-6 w-6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M12 3l2.3 2.3 3.2-.2.8 3.1 2.7 1.7-1.7 2.7.2 3.2-3.1.8L15 19l-3 2-2-3-3.2.2-.8-3.1-2.7-1.7L5 10.7 4.8 7.5l3.1-.8L9 4.3 12 3z" />
         <path d="m8.5 12 2.2 2.2 4.8-5" />
       </svg>
@@ -93,7 +109,15 @@ function Icon({ name }: { name: string }) {
 
   if (name === "bag") {
     return (
-      <svg viewBox="0 0 24 24" className="h-6 w-6" {...common}>
+      <svg
+        viewBox="0 0 24 24"
+        className="h-6 w-6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M5 8h14l1 13H4L5 8z" />
         <path d="M9 8V6a3 3 0 0 1 6 0v2" />
       </svg>
@@ -102,7 +126,15 @@ function Icon({ name }: { name: string }) {
 
   if (name === "store") {
     return (
-      <svg viewBox="0 0 24 24" className="h-6 w-6" {...common}>
+      <svg
+        viewBox="0 0 24 24"
+        className="h-6 w-6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M4 10v10h16V10" />
         <path d="M3 10l2-6h14l2 6" />
         <path d="M3 10a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0" />
@@ -113,7 +145,15 @@ function Icon({ name }: { name: string }) {
 
   if (name === "cart") {
     return (
-      <svg viewBox="0 0 24 24" className="h-6 w-6" {...common}>
+      <svg
+        viewBox="0 0 24 24"
+        className="h-6 w-6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M3 4h2l2 11h10l3-8H6" />
         <circle cx="9" cy="19" r="1.5" />
         <circle cx="17" cy="19" r="1.5" />
@@ -123,7 +163,15 @@ function Icon({ name }: { name: string }) {
 
   if (name === "design") {
     return (
-      <svg viewBox="0 0 24 24" className="h-6 w-6" {...common}>
+      <svg
+        viewBox="0 0 24 24"
+        className="h-6 w-6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M12 20h9" />
         <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4L16.5 3.5z" />
       </svg>
@@ -131,7 +179,15 @@ function Icon({ name }: { name: string }) {
   }
 
   return (
-    <svg viewBox="0 0 24 24" className="h-6 w-6" {...common}>
+    <svg
+      viewBox="0 0 24 24"
+      className="h-6 w-6"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M12 3v18M3 12h18" />
     </svg>
   );
@@ -147,40 +203,43 @@ export default function Home() {
 
       {/* ================= HERO ================= */}
       <section className="relative overflow-hidden bg-[#024949] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_15%,rgba(255,255,255,0.10),transparent_30%),radial-gradient(circle_at_10%_85%,rgba(245,134,74,0.16),transparent_32%)]" />
 
-        <div className="absolute -left-24 top-32 h-56 w-56 rounded-full bg-[#F5864A]/10 blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_10%,rgba(255,255,255,0.10),transparent_28%),radial-gradient(circle_at_10%_90%,rgba(245,134,74,0.16),transparent_30%)]" />
 
-        <div className="absolute -right-24 bottom-10 h-72 w-72 rounded-full bg-teal-300/10 blur-3xl" />
+        <div className="absolute -left-24 top-40 h-60 w-60 rounded-full bg-[#F5864A]/10 blur-3xl" />
 
-        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 pb-12 pt-10 sm:px-6 sm:pb-16 sm:pt-14 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-8 lg:pb-24 lg:pt-20">
+        <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-8 sm:px-6 sm:pb-14 sm:pt-12 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-8 lg:pb-20 lg:pt-16">
 
           {/* ================= HERO TEXT ================= */}
-          <div className="order-1 text-center lg:text-right">
+          <div className="text-center lg:text-right">
 
-            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold text-white/90 shadow-lg backdrop-blur sm:text-sm lg:mx-0">
-              <span className="h-2 w-2 rounded-full bg-[#F5864A] shadow-[0_0_12px_rgba(245,134,74,0.9)]" />
+            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold text-white/90 backdrop-blur sm:text-sm lg:mx-0">
+              <span className="h-2 w-2 rounded-full bg-[#F5864A] shadow-[0_0_12px_rgba(245,134,74,0.8)]" />
               الجودة • السرعة • الاحترافية
             </div>
 
-            <h1 className="mx-auto mt-5 max-w-xl text-[2.25rem] font-black leading-[1.18] tracking-tight sm:text-5xl lg:mx-0 lg:text-6xl">
-              شركة البطنان
+            <h1 className="mx-auto mt-5 max-w-2xl text-[2.45rem] font-black leading-[1.15] tracking-tight sm:text-5xl lg:mx-0 lg:text-6xl">
 
-              <span className="mt-2 block text-[#F5864A]">
+              <span className="block">
+                شركة البطنان
+              </span>
+
+              <span className="mt-1 block text-[#F5864A]">
                 لصناعة وطباعة
               </span>
 
-              <span className="mt-2 block text-white">
+              <span className="mt-1 block">
                 الأكياس البلاستيكية
               </span>
+
             </h1>
 
             <p className="mx-auto mt-5 max-w-xl text-[15px] leading-8 text-white/75 sm:text-lg lg:mx-0">
-              نقدم حلولًا متكاملة لتصنيع وطباعة الأكياس البلاستيكية حسب طلب
-              العميل، للمطاعم والمحلات التجارية والأسواق والمصانع.
+              حلول متكاملة لتصنيع وطباعة الأكياس البلاستيكية حسب طلب العميل،
+              للمطاعم والمحلات التجارية والأسواق والمصانع.
             </p>
 
-            {/* Buttons */}
+            {/* Main buttons */}
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
 
               <Link
@@ -202,106 +261,94 @@ export default function Home() {
 
             </div>
 
-            {/* Trust points */}
-            <div className="mx-auto mt-7 grid max-w-xl grid-cols-1 gap-2 sm:grid-cols-3 lg:mx-0">
+            {/* Trust */}
+            <div className="mx-auto mt-5 grid max-w-xl grid-cols-3 gap-2 lg:mx-0">
 
-              <div className="rounded-xl border border-white/10 bg-white/[0.07] px-3 py-2.5 text-center text-xs font-semibold text-white/80">
+              <div className="rounded-xl border border-white/10 bg-white/[0.06] px-2 py-2.5 text-center text-[10px] font-bold text-white/75 sm:text-xs">
                 ✓ تصنيع حسب الطلب
               </div>
 
-              <div className="rounded-xl border border-white/10 bg-white/[0.07] px-3 py-2.5 text-center text-xs font-semibold text-white/80">
+              <div className="rounded-xl border border-white/10 bg-white/[0.06] px-2 py-2.5 text-center text-[10px] font-bold text-white/75 sm:text-xs">
                 ✓ طباعة احترافية
               </div>
 
-              <div className="rounded-xl border border-white/10 bg-white/[0.07] px-3 py-2.5 text-center text-xs font-semibold text-white/80">
+              <div className="rounded-xl border border-white/10 bg-white/[0.06] px-2 py-2.5 text-center text-[10px] font-bold text-white/75 sm:text-xs">
                 ✓ مراجعة قبل التنفيذ
               </div>
 
             </div>
+
           </div>
 
-          {/* ================= HERO VISUAL ================= */}
-          <div className="order-2 mx-auto w-full max-w-[390px] lg:max-w-[470px]">
+          {/* ================= BRAND CARD ================= */}
+          <div className="mx-auto mt-8 w-full max-w-[430px] lg:mt-0">
 
-            <div className="relative">
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/15 bg-white/10 p-2 shadow-2xl backdrop-blur">
 
-              <div className="absolute -inset-5 rounded-[2.5rem] bg-[#F5864A]/10 blur-3xl" />
+              <div className="rounded-[1.6rem] bg-white p-4 sm:p-5">
 
-              <div className="relative rounded-[2rem] border border-white/15 bg-white/10 p-2 shadow-2xl backdrop-blur-sm sm:p-3">
+                <div className="flex items-center gap-4">
 
-                <div className="rounded-[1.5rem] bg-white p-4 text-slate-900 sm:p-5">
-
-                  {/* Card Header */}
-                  <div className="flex items-center justify-between gap-3">
-
-                    <div>
-                      <p className="text-xs font-bold text-slate-400">
-                        مرحبًا بكم في
-                      </p>
-
-                      <p className="mt-1 text-lg font-black text-[#024949]">
-                        شركة البطنان
-                      </p>
-                    </div>
-
-                    <div className="rounded-full bg-[#024949]/10 px-3 py-1.5 text-[11px] font-black text-[#024949]">
-                      جودة موثوقة
-                    </div>
-
-                  </div>
-
-                  {/* Logo Area */}
-                  <div className="mt-4 flex h-[190px] items-center justify-center overflow-hidden rounded-[1.35rem] bg-slate-50 sm:h-[245px]">
+                  {/* Logo */}
+                  <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-slate-50 sm:h-28 sm:w-28">
 
                     <img
                       src="/iogo.jpeg"
                       alt="شعار شركة البطنان"
-                      className="h-36 w-36 object-contain sm:h-48 sm:w-48"
+                      className="h-20 w-20 object-contain sm:h-24 sm:w-24"
                     />
 
                   </div>
 
-                  {/* Info Cards */}
-                  <div className="mt-4 grid grid-cols-2 gap-3">
+                  {/* Brand information */}
+                  <div className="min-w-0 text-right">
 
-                    <div className="rounded-2xl bg-[#024949] px-4 py-3 text-white">
-                      <p className="text-[11px] text-white/60">
-                        الخدمة
-                      </p>
+                    <p className="text-xs font-bold text-slate-400">
+                      مرحبًا بكم في
+                    </p>
 
-                      <p className="mt-1 text-sm font-black">
-                        تصنيع وطباعة
-                      </p>
-                    </div>
+                    <h2 className="mt-1 text-xl font-black text-[#024949] sm:text-2xl">
+                      شركة البطنان
+                    </h2>
 
-                    <div className="rounded-2xl bg-orange-50 px-4 py-3 text-[#024949]">
-                      <p className="text-[11px] text-slate-400">
-                        التنفيذ
-                      </p>
-
-                      <p className="mt-1 text-sm font-black">
-                        حسب الطلب
-                      </p>
-                    </div>
+                    <p className="mt-1 text-xs leading-5 text-slate-500 sm:text-sm">
+                      لصناعة وطباعة الأكياس البلاستيكية
+                    </p>
 
                   </div>
+
                 </div>
-              </div>
 
-              {/* Small Floating Badge - Desktop */}
-              <div className="absolute -bottom-4 right-4 hidden rounded-2xl border border-white/15 bg-white/95 px-4 py-3 shadow-xl sm:block">
+                <div className="mt-4 h-px bg-slate-100" />
 
-                <p className="text-[11px] font-bold text-slate-400">
-                  نراجع التفاصيل
-                </p>
+                <div className="mt-4 grid grid-cols-2 gap-3">
 
-                <p className="mt-0.5 text-sm font-black text-[#024949]">
-                  قبل بدء التنفيذ ✓
-                </p>
+                  <div className="rounded-2xl bg-[#024949] px-3 py-3 text-white">
+                    <p className="text-[10px] text-white/55">
+                      الخدمة
+                    </p>
+
+                    <p className="mt-1 text-sm font-black">
+                      تصنيع وطباعة
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl bg-orange-50 px-3 py-3 text-[#024949]">
+                    <p className="text-[10px] text-slate-400">
+                      التنفيذ
+                    </p>
+
+                    <p className="mt-1 text-sm font-black">
+                      حسب الطلب
+                    </p>
+                  </div>
+
+                </div>
 
               </div>
 
             </div>
+
           </div>
 
         </div>
@@ -332,7 +379,6 @@ export default function Home() {
 
           </div>
 
-          {/* Features */}
           <div className="mt-9 grid gap-4 md:grid-cols-3">
 
             {features.map((feature) => (
@@ -398,7 +444,6 @@ export default function Home() {
 
           </div>
 
-          {/* Services */}
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
             {services.map((service) => (
@@ -453,7 +498,6 @@ export default function Home() {
             className="mt-7 inline-flex min-h-14 items-center justify-center rounded-2xl bg-[#F5864A] px-8 font-black shadow-xl transition active:scale-[0.98] hover:bg-[#e9783d]"
           >
             ابدأ طلبك الآن
-
             <span className="mr-2 text-xl">
               ←
             </span>
@@ -483,7 +527,6 @@ export default function Home() {
 
           <div className="grid gap-4 sm:grid-cols-2">
 
-            {/* Phone */}
             <a
               href="tel:0923324462"
               className="rounded-3xl border border-slate-200 bg-slate-50 p-6 transition hover:-translate-y-1 hover:shadow-lg"
@@ -503,7 +546,6 @@ export default function Home() {
 
             </a>
 
-            {/* Location */}
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
 
               <p className="text-sm font-bold text-slate-400">
