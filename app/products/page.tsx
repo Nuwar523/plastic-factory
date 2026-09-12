@@ -1,10 +1,11 @@
 import Link from "next/link";
+import Navbar from "../components/Navbar";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function ProductsPage() {
   const supabase = await createClient();
 
-  const { data: products } = await supabase
+  const { data: products, error } = await supabase
     .from("products")
     .select("*")
     .eq("status", "active")
@@ -13,148 +14,103 @@ export default async function ProductsPage() {
   return (
     <main
       dir="rtl"
-      className="min-h-screen bg-slate-50 text-slate-900"
+      className="min-h-screen overflow-x-hidden bg-slate-50 text-slate-900"
     >
-      {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
+      <Navbar />
 
-          {/* Logo */}
-          <Link
-            href="/"
-            className="flex min-w-0 items-center gap-2 sm:gap-3"
-          >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-teal-50 sm:h-11 sm:w-11">
-              <img
-                src="/iogo.jpeg"
-                alt="شركة البطنان"
-                className="h-full w-full object-cover"
-              />
-            </div>
+      {/* ================= HERO ================= */}
+      <section className="bg-[#024949] text-white">
+        <div className="mx-auto max-w-7xl px-4 pb-10 pt-8 sm:px-6 sm:pb-12 sm:pt-12 lg:px-8">
+          <div className="max-w-3xl">
+            <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold backdrop-blur sm:px-4 sm:py-2 sm:text-sm">
+              منتجاتنا
+            </span>
 
-            <div className="min-w-0">
-              <p className="truncate text-sm font-black text-teal-600 sm:text-lg">
-                شركة البطنان
-              </p>
+            <h1 className="mt-4 text-3xl font-black leading-tight sm:text-5xl">
+              منتجات شركة البطنان
+            </h1>
 
-              <p className="hidden text-xs text-slate-500 sm:block">
-                لصناعة وطباعة الأكياس البلاستيكية
-              </p>
-            </div>
-          </Link>
-
-          {/* Home */}
-          <Link
-            href="/"
-            className="shrink-0 rounded-xl bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 transition hover:bg-teal-50 hover:text-teal-700 sm:px-5 sm:py-2.5 sm:text-sm"
-          >
-            الرئيسية
-          </Link>
-        </div>
-      </header>
-
-      {/* Hero / Page Title */}
-      <section className="mx-auto w-full max-w-7xl px-4 pb-7 pt-8 sm:px-6 sm:pb-10 sm:pt-12 lg:px-8">
-
-        <div className="max-w-3xl">
-          <span className="inline-flex rounded-full bg-teal-50 px-3 py-1.5 text-xs font-bold text-teal-700 sm:px-4 sm:py-2 sm:text-sm">
-            منتجاتنا
-          </span>
-
-          <h1 className="mt-3 text-2xl font-black leading-tight tracking-tight text-slate-900 sm:mt-4 sm:text-4xl lg:text-5xl">
-            منتجات شركة البطنان
-          </h1>
-
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 sm:mt-4 sm:text-base sm:leading-7">
-            نوفر أكياس بلاستيكية مصنّعة ومطبوعة حسب احتياجات العملاء،
-            بجودة مناسبة لمختلف الاستخدامات.
-          </p>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/70 sm:text-base sm:leading-8">
+              اختر المنتج المناسب لك، واضغط عليه لمشاهدة جميع تفاصيله وإرسال
+              طلبك.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* Products */}
-      <section className="mx-auto w-full max-w-7xl px-4 pb-12 sm:px-6 sm:pb-16 lg:px-8">
+      {/* ================= PRODUCTS ================= */}
+      <section className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-10 lg:px-8">
+        {error ? (
+          <div className="rounded-3xl border border-red-200 bg-red-50 p-6 text-center">
+            <h2 className="text-lg font-black text-red-700">
+              تعذر تحميل المنتجات
+            </h2>
 
-        {products && products.length > 0 ? (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-
+            <p className="mt-2 text-sm text-red-600">
+              يرجى تحديث الصفحة والمحاولة مرة أخرى.
+            </p>
+          </div>
+        ) : products && products.length > 0 ? (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => (
-              <article
+              <Link
                 key={product.id}
-                className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:rounded-3xl"
+                href={`/products/${product.id}`}
+                className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-xl active:scale-[0.99] sm:rounded-3xl"
               >
+                {/* IMAGE */}
+                <div className="relative aspect-square overflow-hidden bg-slate-100">
+                  <img
+                    src={
+                      product.image ||
+                      "https://placehold.co/800x800?text=Product"
+                    }
+                    alt={product.name}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
 
-                {/* Product Image */}
-                <Link
-                  href={`/products/${product.id}`}
-                  className="block overflow-hidden bg-slate-100"
-                >
-                  <div className="aspect-[16/10] w-full sm:aspect-[4/3]">
-                    <img
-                      src={
-                        product.image ||
-                        "https://placehold.co/800x600?text=Product"
-                      }
-                      alt={product.name}
-                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                </Link>
-
-                {/* Product Information */}
-                <div className="p-4 sm:p-6">
-
-                  {/* Category */}
-                  <span className="text-xs font-bold text-teal-600 sm:text-sm">
+                  <span className="absolute right-2 top-2 rounded-full bg-white/95 px-2 py-1 text-[10px] font-black text-[#024949] shadow-sm sm:right-3 sm:top-3 sm:px-3 sm:py-1.5 sm:text-xs">
                     {product.category || "منتج بلاستيكي"}
                   </span>
+                </div>
 
-                  {/* Name */}
-                  <h2 className="mt-1.5 line-clamp-2 text-lg font-black leading-7 text-slate-900 sm:mt-2 sm:text-2xl sm:leading-8">
+                {/* INFO */}
+                <div className="flex flex-1 flex-col p-3 sm:p-5">
+                  <h2 className="line-clamp-2 text-sm font-black leading-6 text-slate-900 sm:text-lg sm:leading-7">
                     {product.name}
                   </h2>
 
-                  {/* Description */}
-                  <p className="mt-2 line-clamp-2 min-h-[48px] text-sm leading-6 text-slate-500">
+                  <p className="mt-1.5 line-clamp-2 text-[11px] leading-5 text-slate-500 sm:mt-2 sm:text-sm sm:leading-6">
                     {product.description ||
-                      "منتج متوفر حسب الطلب وبجودة مناسبة لاحتياجاتك."}
+                      "منتج يتم تصنيعه حسب الطلب."}
                   </p>
 
-                  {/* Price + Button */}
-                  <div className="mt-5 flex flex-col gap-4 border-t border-slate-100 pt-4 sm:flex-row sm:items-end sm:justify-between sm:gap-3 sm:pt-5">
-
-                    {/* Price */}
-                    <div>
-                      <p className="text-xs font-medium text-slate-400">
+                  <div className="mt-auto pt-3 sm:pt-5">
+                    <div className="mb-2 border-t border-slate-100 pt-3 sm:mb-3 sm:pt-4">
+                      <p className="text-[9px] font-bold text-slate-400 sm:text-xs">
                         السعر المعلن
                       </p>
 
-                      <p className="mt-1 text-xl font-black text-teal-600 sm:text-2xl">
+                      <p className="mt-0.5 text-base font-black text-[#024949] sm:text-xl">
                         LYD {product.price}
                       </p>
                     </div>
 
-                    {/* View Product */}
-                    <Link
-                      href={`/products/${product.id}`}
-                      className="flex w-full items-center justify-center rounded-xl bg-teal-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-teal-700 active:scale-[0.98] sm:w-auto sm:text-base"
-                    >
-                      عرض المنتج
-                      <span className="mr-2">←</span>
-                    </Link>
+                    <div className="flex items-center justify-center rounded-xl bg-[#024949] px-2 py-2.5 text-[11px] font-black text-white transition group-hover:bg-[#013c3c] sm:py-3 sm:text-sm">
+                      عرض التفاصيل
 
+                      <span className="mr-1.5 text-base">
+                        ←
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </article>
+              </Link>
             ))}
-
           </div>
         ) : (
-
-          /* No Products */
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-12 text-center sm:rounded-3xl sm:p-14">
-
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-teal-50 text-3xl">
+          <div className="rounded-3xl border border-dashed border-slate-300 bg-white px-5 py-14 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-teal-50 text-2xl">
               📦
             </div>
 
@@ -165,19 +121,16 @@ export default async function ProductsPage() {
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
               يرجى العودة لاحقًا لمشاهدة منتجاتنا.
             </p>
-
           </div>
         )}
-
       </section>
 
-      {/* Footer */}
+      {/* ================= FOOTER ================= */}
       <footer className="border-t border-slate-200 bg-white px-4 py-6 text-center">
         <p className="text-xs leading-5 text-slate-400 sm:text-sm">
           © شركة البطنان لصناعة وطباعة الأكياس البلاستيكية
         </p>
       </footer>
-
     </main>
   );
 }
