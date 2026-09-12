@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import Navbar from "../../../components/Navbar";
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 
 type Props = {
   params: Promise<{
@@ -13,9 +13,10 @@ export default async function OrderPage({ params }: Props) {
   const { id } = await params;
 
   const supabase = await createClient();
+
   const {
-  data: { user },
-} = await supabase.auth.getUser();
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const { data: product } = await supabase
     .from("products")
@@ -32,37 +33,46 @@ export default async function OrderPage({ params }: Props) {
     "use server";
 
     const supabase = await createClient();
-    const {
-  data: { user },
-} = await supabase.auth.getUser();
 
-    const customerName = String(formData.get("customer_name") || "").trim();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const customerName = String(
+      formData.get("customer_name") || ""
+    ).trim();
+
     const phone = String(formData.get("phone") || "").trim();
+
     const city = String(formData.get("city") || "").trim();
+
     const quantity = Number(formData.get("quantity"));
+
     const notes = String(formData.get("notes") || "").trim();
+
     const image = formData.get("image") as File;
 
-let imageUrl: string | null = null;
+    let imageUrl: string | null = null;
 
-if (image && image.size > 0) {
-  const fileExt = image.name.split(".").pop() || "jpg";
-const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
+    if (image && image.size > 0) {
+      const fileExt = image.name.split(".").pop() || "jpg";
 
-  const { error: uploadError } = await supabase.storage
-    .from("order-images")
-    .upload(fileName, image);
+      const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
 
-  if (uploadError) {
-    throw new Error(uploadError.message);
-  }
+      const { error: uploadError } = await supabase.storage
+        .from("order-images")
+        .upload(fileName, image);
 
-  const { data } = supabase.storage
-    .from("order-images")
-    .getPublicUrl(fileName);
+      if (uploadError) {
+        throw new Error(uploadError.message);
+      }
 
-  imageUrl = data.publicUrl;
-}
+      const { data } = supabase.storage
+        .from("order-images")
+        .getPublicUrl(fileName);
+
+      imageUrl = data.publicUrl;
+    }
 
     if (!customerName || !phone || !city || !quantity || quantity < 1) {
       return;
@@ -72,20 +82,20 @@ const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
       .from("orders")
       .insert({
         user_id: user?.id ?? null,
-  customer_name: customerName,
-  phone,
-  city,
-  notes: notes || null,
-  customer_image: imageUrl,
-})
+        customer_name: customerName,
+        phone,
+        city,
+        notes: notes || null,
+        customer_image: imageUrl,
+      })
       .select("id")
       .single();
 
     if (orderError || !order) {
-  throw new Error(
-    orderError?.message || "فشل في إنشاء الطلب"
-  );
-}
+      throw new Error(
+        orderError?.message || "فشل في إنشاء الطلب"
+      );
+    }
 
     const { error: itemError } = await supabase
       .from("order_items")
@@ -99,163 +109,240 @@ const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
       throw new Error("فشل في إضافة المنتج إلى الطلب");
     }
 
-   redirect(`/products/${product.id}/order/success?orderId=${order.id}`);
+    redirect(
+      `/products/${product.id}/order/success?orderId=${order.id}`
+    );
   }
 
   return (
-    <main dir="rtl" className="min-h-screen bg-gray-50">
+    <main
+      dir="rtl"
+      className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-900"
+    >
+      <Navbar />
 
-      <header className="border-b bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <Link
-            href="/"
-            className="text-2xl font-bold text-teal-600"
-          >
-            شركة البطنان
-          </Link>
-
+      {/* عنوان الصفحة */}
+      <section className="w-full border-b border-slate-200 bg-white">
+        <div className="mx-auto w-full max-w-5xl px-4 py-5 sm:px-6 sm:py-7 lg:px-8">
           <Link
             href={`/products/${product.id}`}
-            className="font-medium text-gray-600"
+            className="inline-flex max-w-full items-center rounded-xl bg-slate-50 px-3 py-2 text-xs font-bold text-slate-600 ring-1 ring-slate-200 transition hover:text-[#024949] sm:px-4 sm:py-2.5 sm:text-sm"
           >
-            ← العودة للمنتج
+            <span className="ml-2 shrink-0">→</span>
+            <span>العودة إلى المنتج</span>
           </Link>
         </div>
-      </header>
-
-      <section className="mx-auto max-w-3xl px-6 py-12">
-
-        <div className="rounded-3xl bg-white p-6 shadow-sm md:p-10">
-
-          <div className="mb-8">
-            <p className="font-semibold text-teal-600">
-              طلب منتج
-            </p>
-
-            <h1 className="mt-2 text-3xl font-bold text-gray-900">
-              {product.name}
-            </h1>
-
-            <p className="mt-2 text-gray-500">
-              يرجى تعبئة البيانات التالية لإرسال طلبك للمراجعة.
-            </p>
-          </div>
-
-          <form action={submitOrder} className="space-y-5">
-
-            <div>
-              <label className="mb-2 block font-semibold">
-                الاسم الكامل
-              </label>
-
-              <input
-                name="customer_name"
-                type="text"
-                required
-                placeholder="اكتب اسمك الكامل"
-                className="w-full rounded-xl border border-gray-300 p-3 outline-none focus:border-teal-500"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block font-semibold">
-                رقم الهاتف
-              </label>
-
-              <input
-                name="phone"
-                type="tel"
-                required
-                placeholder="09XXXXXXXX"
-                className="w-full rounded-xl border border-gray-300 p-3 outline-none focus:border-teal-500"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block font-semibold">
-                المدينة / المنطقة
-              </label>
-
-              <input
-                name="city"
-                type="text"
-                required
-                placeholder="مثال: طبرق"
-                className="w-full rounded-xl border border-gray-300 p-3 outline-none focus:border-teal-500"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block font-semibold">
-                الكمية المطلوبة
-              </label>
-
-              <input
-                name="quantity"
-                type="number"
-                min="1"
-                required
-                placeholder="اكتب الكمية"
-                className="w-full rounded-xl border border-gray-300 p-3 outline-none focus:border-teal-500"
-              />
-            </div>
-            <div>
-  <label className="mb-2 block font-semibold">
-    صورة مرفقة
-  </label>
-
-  <input
-    name="image"
-    type="file"
-    accept="image/*"
-    className="w-full rounded-xl border border-gray-300 bg-white p-3"
-  />
-
-  <p className="mt-2 text-sm text-gray-500">
-    يمكنك رفع صورة توضح التصميم أو الشكل المطلوب.
-  </p>
-</div>
-
-            <div>
-              <label className="mb-2 block font-semibold">
-                ملاحظات الطلب
-              </label>
-
-              <textarea
-                name="notes"
-                rows={5}
-                placeholder="مثال: اللون، المقاس، نوع الطباعة، أو أي تفاصيل إضافية..."
-                className="w-full rounded-xl border border-gray-300 p-3 outline-none focus:border-teal-500"
-              />
-            </div>
-
-            <div className="rounded-xl bg-gray-50 p-4">
-              <p className="text-sm text-gray-500">
-                السعر المعلن
-              </p>
-
-              <p className="mt-1 text-2xl font-bold text-teal-600">
-                LYD {product.price}
-              </p>
-
-              <p className="mt-1 text-sm text-gray-500">
-                قد تختلف الأسعار للكميات الكبيرة بعد مراجعة الطلب.
-              </p>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full rounded-xl bg-teal-600 px-6 py-4 text-lg font-bold text-white transition hover:bg-teal-700"
-            >
-              إرسال الطلب للمراجعة
-            </button>
-
-          </form>
-
-        </div>
-
       </section>
 
+      <section className="mx-auto w-full max-w-5xl px-3 py-5 sm:px-6 sm:py-10 lg:px-8">
+        <div className="w-full min-w-0 overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-sm sm:rounded-[2rem]">
+          {/* رأس الطلب */}
+          <div className="border-b border-slate-100 p-4 sm:p-8">
+            <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-center">
+              {/* صورة المنتج */}
+              <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-slate-100 sm:h-28 sm:w-28">
+                <img
+                  src={
+                    product.image ||
+                    "https://placehold.co/400x400?text=Product"
+                  }
+                  alt={product.name}
+                  className="h-full w-full object-contain"
+                />
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <span className="inline-flex rounded-full bg-[#024949]/10 px-3 py-1 text-[11px] font-black text-[#024949] sm:text-xs">
+                  طلب منتج
+                </span>
+
+                <h1 className="mt-2 break-words text-2xl font-black leading-[1.4] text-slate-900 sm:text-3xl">
+                  {product.name}
+                </h1>
+
+                <p className="mt-2 break-words text-sm leading-7 text-slate-500">
+                  يرجى تعبئة البيانات التالية لإرسال طلبك للمراجعة.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* النموذج */}
+          <div className="p-4 sm:p-8 lg:p-10">
+            <form
+              action={submitOrder}
+              encType="multipart/form-data"
+              className="space-y-5"
+            >
+              {/* الاسم */}
+              <div>
+                <label
+                  htmlFor="customer_name"
+                  className="mb-2 block text-sm font-black text-slate-800"
+                >
+                  الاسم الكامل
+                </label>
+
+                <input
+                  id="customer_name"
+                  name="customer_name"
+                  type="text"
+                  required
+                  autoComplete="name"
+                  placeholder="اكتب اسمك الكامل"
+                  className="block min-h-12 w-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#024949] focus:bg-white focus:ring-4 focus:ring-[#024949]/10"
+                />
+              </div>
+
+              {/* الهاتف */}
+              <div>
+                <label
+                  htmlFor="phone"
+                  className="mb-2 block text-sm font-black text-slate-800"
+                >
+                  رقم الهاتف
+                </label>
+
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  required
+                  inputMode="tel"
+                  autoComplete="tel"
+                  placeholder="09XXXXXXXX"
+                  className="block min-h-12 w-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#024949] focus:bg-white focus:ring-4 focus:ring-[#024949]/10"
+                />
+              </div>
+
+              {/* المدينة */}
+              <div>
+                <label
+                  htmlFor="city"
+                  className="mb-2 block text-sm font-black text-slate-800"
+                >
+                  المدينة / المنطقة
+                </label>
+
+                <input
+                  id="city"
+                  name="city"
+                  type="text"
+                  required
+                  autoComplete="address-level2"
+                  placeholder="مثال: طبرق"
+                  className="block min-h-12 w-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#024949] focus:bg-white focus:ring-4 focus:ring-[#024949]/10"
+                />
+              </div>
+
+              {/* الكمية */}
+              <div>
+                <label
+                  htmlFor="quantity"
+                  className="mb-2 block text-sm font-black text-slate-800"
+                >
+                  الكمية المطلوبة
+                </label>
+
+                <input
+                  id="quantity"
+                  name="quantity"
+                  type="number"
+                  min="1"
+                  required
+                  inputMode="numeric"
+                  placeholder="اكتب الكمية"
+                  className="block min-h-12 w-full min-w-0 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#024949] focus:bg-white focus:ring-4 focus:ring-[#024949]/10"
+                />
+              </div>
+
+              {/* رفع الصورة */}
+              <div>
+                <label
+                  htmlFor="image"
+                  className="mb-2 block text-sm font-black text-slate-800"
+                >
+                  صورة مرفقة
+                </label>
+
+                <div className="w-full min-w-0 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-3 sm:p-4">
+                  <input
+                    id="image"
+                    name="image"
+                    type="file"
+                    accept="image/*"
+                    className="block w-full min-w-0 text-sm text-slate-600 file:ml-3 file:rounded-xl file:border-0 file:bg-[#024949] file:px-4 file:py-2.5 file:text-sm file:font-bold file:text-white hover:file:bg-[#013c3c]"
+                  />
+
+                  <p className="mt-2 break-words text-xs leading-6 text-slate-400 sm:text-sm">
+                    يمكنك رفع صورة للتصميم أو الشكل المطلوب.
+                  </p>
+                </div>
+              </div>
+
+              {/* الملاحظات */}
+              <div>
+                <label
+                  htmlFor="notes"
+                  className="mb-2 block text-sm font-black text-slate-800"
+                >
+                  ملاحظات الطلب
+                </label>
+
+                <textarea
+                  id="notes"
+                  name="notes"
+                  rows={5}
+                  placeholder="مثال: اللون، المقاس، نوع الطباعة، أو أي تفاصيل إضافية..."
+                  className="block min-h-32 w-full min-w-0 resize-y rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-base leading-7 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#024949] focus:bg-white focus:ring-4 focus:ring-[#024949]/10"
+                />
+              </div>
+
+              {/* السعر */}
+              <div className="w-full min-w-0 rounded-2xl bg-[#024949]/5 p-4 sm:p-5">
+                <div className="flex min-w-0 items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-slate-400 sm:text-sm">
+                      السعر المعلن
+                    </p>
+
+                    <p className="mt-1 break-words text-2xl font-black text-[#024949] sm:text-3xl">
+                      LYD {product.price}
+                    </p>
+                  </div>
+
+                  <div className="shrink-0 rounded-xl bg-white px-3 py-2 text-xs font-bold text-[#024949] shadow-sm">
+                    سعر مبدئي
+                  </div>
+                </div>
+
+                <p className="mt-3 break-words text-xs leading-6 text-slate-500 sm:text-sm">
+                  قد تختلف الأسعار للكميات الكبيرة بعد مراجعة الطلب.
+                </p>
+              </div>
+
+              {/* زر الإرسال */}
+              <button
+                type="submit"
+                className="flex min-h-14 w-full min-w-0 items-center justify-center rounded-2xl bg-[#024949] px-5 text-base font-black text-white shadow-lg shadow-[#024949]/20 transition hover:bg-[#013c3c] active:scale-[0.99] sm:text-lg"
+              >
+                إرسال الطلب للمراجعة
+                <span className="mr-2 text-xl">←</span>
+              </button>
+
+              <p className="px-2 text-center text-xs leading-6 text-slate-400">
+                بعد إرسال الطلب ستتم مراجعته من فريق شركة البطنان.
+              </p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-slate-200 bg-white px-4 py-7 text-center">
+        <p className="text-xs leading-6 text-slate-400 sm:text-sm">
+          © شركة البطنان لصناعة وطباعة الأكياس البلاستيكية
+        </p>
+      </footer>
     </main>
   );
 }
