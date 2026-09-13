@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import SubmitButton from "./SubmitButton";
 import Navbar from "../../../components/Navbar";
 import { createClient } from "@/lib/supabase/server";
 
@@ -322,13 +323,7 @@ export default async function OrderPage({ params }: Props) {
               </div>
 
               {/* زر الإرسال */}
-              <button
-                type="submit"
-                className="flex min-h-14 w-full min-w-0 items-center justify-center rounded-2xl bg-[#024949] px-5 text-base font-black text-white shadow-lg shadow-[#024949]/20 transition hover:bg-[#013c3c] active:scale-[0.99] sm:text-lg"
-              >
-                إرسال الطلب للمراجعة
-                <span className="mr-2 text-xl">←</span>
-              </button>
+              <SubmitButton />
 
               <p className="px-2 text-center text-xs leading-6 text-slate-400">
                 بعد إرسال الطلب ستتم مراجعته من فريق شركة البطنان.
