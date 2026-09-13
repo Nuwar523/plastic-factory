@@ -12,8 +12,11 @@ export async function createAdminUser(
   prevState: State,
   formData: FormData
 ): Promise<State> {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+  const email = String(formData.get("email") || "")
+    .trim()
+    .toLowerCase();
+
+  const password = String(formData.get("password") || "");
 
   if (!email || !password) {
     return {
@@ -38,6 +41,12 @@ export async function createAdminUser(
     email,
     password,
     email_confirm: true,
+
+    // الحسابات التي يتم إنشاؤها من لوحة المستخدمين
+    // تعتبر حسابات موظفين ولها صلاحية دخول لوحة الإدارة.
+    app_metadata: {
+      role: "admin",
+    },
   });
 
   if (error) {
