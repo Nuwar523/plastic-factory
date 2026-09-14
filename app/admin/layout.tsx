@@ -161,18 +161,7 @@ export default function AdminLayout({
             </div>
 
 
-            {/* Logout */}
-            <div className="mt-auto border-t border-slate-100 pt-4">
-
-              <Link
-                href="/admin/logout"
-                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-red-500 transition hover:bg-red-50"
-              >
-                <span className="text-lg">🚪</span>
-                <span>تسجيل الخروج</span>
-              </Link>
-
-            </div>
+            
 
           </div>
 
