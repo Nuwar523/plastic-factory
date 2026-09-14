@@ -1,12 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { updateSession } from "@/lib/supabase/proxy";
 
 const ADMIN_EMAIL = "mohammed2020@gmail.com";
 
 export async function proxy(request: NextRequest) {
-  let response = NextResponse.next({
-    request,
-  });
+  const response = await updateSession(request);
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -17,19 +16,7 @@ export async function proxy(request: NextRequest) {
           return request.cookies.getAll();
         },
 
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => {
-            request.cookies.set(name, value);
-          });
-
-          response = NextResponse.next({
-            request,
-          });
-
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
-        },
+        setAll() {},
       },
     }
   );
@@ -42,9 +29,7 @@ export async function proxy(request: NextRequest) {
 
   if (pathname.startsWith("/admin")) {
     if (!user) {
-      return NextResponse.redirect(
-        new URL("/login", request.url)
-      );
+      return redirectWithCookies("/login", request, response);
     }
 
     const isMainAdmin =
@@ -54,13 +39,27 @@ export async function proxy(request: NextRequest) {
       user.app_metadata?.role === "admin";
 
     if (!isMainAdmin && !isAdmin) {
-      return NextResponse.redirect(
-        new URL("/", request.url)
-      );
+      return redirectWithCookies("/", request, response);
     }
   }
 
   return response;
+}
+
+function redirectWithCookies(
+  path: string,
+  request: NextRequest,
+  response: NextResponse
+) {
+  const redirectResponse = NextResponse.redirect(
+    new URL(path, request.url)
+  );
+
+  response.cookies.getAll().forEach((cookie) => {
+    redirectResponse.cookies.set(cookie);
+  });
+
+  return redirectResponse;
 }
 
 export const config = {
