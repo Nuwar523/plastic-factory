@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const ADMIN_EMAIL = "mohammed2020@gmail.com";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request,
   });
@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
         },
 
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
+          cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value);
           });
 
@@ -40,17 +40,20 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  // Protect all /admin pages
   if (pathname.startsWith("/admin")) {
-    // Not logged in
     if (!user) {
       return NextResponse.redirect(
         new URL("/login", request.url)
       );
     }
 
-    // Logged in but not the admin
-    if (user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+    const isMainAdmin =
+      user.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+
+    const isAdmin =
+      user.app_metadata?.role === "admin";
+
+    if (!isMainAdmin && !isAdmin) {
       return NextResponse.redirect(
         new URL("/", request.url)
       );
