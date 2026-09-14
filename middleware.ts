@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
         },
 
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => {
+          cookiesToSet.forEach(({ name, value, options }) => {
             request.cookies.set(name, value);
           });
 
@@ -40,23 +40,17 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  // حماية جميع صفحات /admin
+  // Protect all /admin pages
   if (pathname.startsWith("/admin")) {
-    // غير مسجل الدخول
+    // Not logged in
     if (!user) {
       return NextResponse.redirect(
         new URL("/login", request.url)
       );
     }
 
-    const isMainAdmin =
-      user.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-
-    const isAdmin =
-      user.app_metadata?.role === "admin";
-
-    // إذا ليس الأدمن الرئيسي ولا يملك صلاحية admin
-    if (!isMainAdmin && !isAdmin) {
+    // Logged in but not the admin
+    if (user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
       return NextResponse.redirect(
         new URL("/", request.url)
       );
