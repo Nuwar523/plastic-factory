@@ -11,33 +11,157 @@ export default function AdminLayout({
       {/* ================= HEADER ================= */}
       <header className="sticky top-0 z-50 h-20 border-b border-slate-200 bg-white shadow-sm">
 
-        <div className="mx-auto flex h-full w-full items-center justify-between px-5 sm:px-6 lg:px-8">
+        <div className="relative mx-auto flex h-full w-full items-center justify-between px-4 sm:px-6 lg:px-8">
 
           {/* Logo */}
           <Link
             href="/admin"
-            className="flex items-center gap-3"
+            className="flex min-w-0 items-center gap-2.5 sm:gap-3"
           >
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-600 text-xl font-bold text-white shadow-sm">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-teal-600 text-lg font-bold text-white shadow-sm sm:h-11 sm:w-11 sm:text-xl">
               ب
             </div>
 
-            <div>
-              <h1 className="font-bold text-slate-900">
+            <div className="min-w-0">
+              <h1 className="truncate text-sm font-bold text-slate-900 sm:text-base">
                 شركة البطنان
               </h1>
 
-              <p className="text-xs text-slate-500">
+              <p className="truncate text-[10px] text-slate-500 sm:text-xs">
                 نظام إدارة المصنع
               </p>
             </div>
           </Link>
 
 
-          {/* Admin */}
-          <div className="flex items-center gap-3">
+          {/* ================= MOBILE MENU ================= */}
+          <details className="relative lg:hidden">
 
-            <div className="hidden text-left sm:block">
+            <summary className="flex h-11 cursor-pointer list-none items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition active:scale-95 [&::-webkit-details-marker]:hidden">
+              <span className="text-lg leading-none">☰</span>
+              <span>القائمة</span>
+            </summary>
+
+            <div className="absolute left-0 top-14 z-[60] w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl">
+
+              {/* Mobile menu title */}
+              <div className="mb-2 border-b border-slate-100 px-2 pb-3">
+                <p className="text-sm font-bold text-slate-900">
+                  لوحة إدارة المصنع
+                </p>
+
+                <p className="mt-0.5 text-xs text-slate-500">
+                  اختر القسم الذي تريد الدخول إليه
+                </p>
+              </div>
+
+
+              {/* Main menu */}
+              <nav className="space-y-1">
+
+                <Link
+                  href="/admin"
+                  className="flex min-h-12 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-teal-50 hover:text-teal-700 active:bg-teal-50"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-lg">
+                    🏠
+                  </span>
+
+                  <span>الرئيسية</span>
+                </Link>
+
+
+                <Link
+                  href="/admin/orders"
+                  className="flex min-h-12 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-teal-50 hover:text-teal-700 active:bg-teal-50"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-lg">
+                    🛒
+                  </span>
+
+                  <span>الطلبات</span>
+                </Link>
+
+
+                <Link
+                  href="/admin/products"
+                  className="flex min-h-12 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-teal-50 hover:text-teal-700 active:bg-teal-50"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-lg">
+                    📦
+                  </span>
+
+                  <span>المنتجات</span>
+                </Link>
+
+
+                <Link
+                  href="/admin/reports"
+                  className="flex min-h-12 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-teal-50 hover:text-teal-700 active:bg-teal-50"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-lg">
+                    📊
+                  </span>
+
+                  <span>التقارير</span>
+                </Link>
+
+
+                <Link
+                  href="/admin/users"
+                  className="flex min-h-12 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-teal-50 hover:text-teal-700 active:bg-teal-50"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-lg">
+                    👥
+                  </span>
+
+                  <span>المستخدمون</span>
+                </Link>
+
+              </nav>
+
+
+              {/* Divider */}
+              <div className="my-3 border-t border-slate-100" />
+
+
+              {/* System */}
+              <nav className="space-y-1">
+
+                <Link
+                  href="/admin/settings"
+                  className="flex min-h-12 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:text-teal-700 active:bg-slate-50"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-lg">
+                    ⚙️
+                  </span>
+
+                  <span>الإعدادات</span>
+                </Link>
+
+
+                <Link
+                  href="/"
+                  className="flex min-h-12 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:text-teal-700 active:bg-slate-50"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-lg">
+                    🌐
+                  </span>
+
+                  <span>زيارة الموقع</span>
+                </Link>
+
+              </nav>
+
+            </div>
+
+          </details>
+
+
+          {/* ================= ADMIN ================= */}
+          <div className="hidden items-center gap-3 sm:flex">
+
+            <div className="hidden text-left md:block">
               <p className="text-sm font-semibold text-slate-800">
                 مدير النظام
               </p>
@@ -112,13 +236,15 @@ export default function AdminLayout({
                   <span className="text-lg">📊</span>
                   <span>التقارير</span>
                 </Link>
+
+
                 <Link
-  href="/admin/users"
-  className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-teal-50 hover:text-teal-700"
->
-  <span className="text-lg">👥</span>
-  <span>المستخدمون</span>
-</Link>
+                  href="/admin/users"
+                  className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-teal-50 hover:text-teal-700"
+                >
+                  <span className="text-lg">👥</span>
+                  <span>المستخدمون</span>
+                </Link>
 
               </nav>
 
@@ -159,9 +285,6 @@ export default function AdminLayout({
               </nav>
 
             </div>
-
-
-            
 
           </div>
 
